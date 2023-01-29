@@ -1,0 +1,9 @@
+{
+    "id": "shorturl",
+    "version": 1,
+    "requirement": 1,
+    "author": "The OMMP Team",
+    "website": "https://ommp.app/marketplace/shorturl",
+    "contact": "contact@ommp.app",
+    "default_language": "en"
+}

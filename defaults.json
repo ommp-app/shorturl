@@ -1,0 +1,27 @@
+{
+    "configurations": {
+        "lenght": "5",
+		"reserved": "ommp,registration,connection,settings,api,media",
+		"characters": "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+    },
+    "rights": {
+        "use": [1, 1, 1], 
+        "use_media": [1, 1, 1],
+		"see_stats": [1, 1, 0],
+		"see_list": [1, 1, 0],
+		"edit": [1, 0, 0],
+		"see_all": [1, 0, 0],
+		"delete_any": [1, 0, 0],
+		"edit_any": [1, 0, 0]
+    },
+    "protected": {
+        "use": [0, 0, 0],
+        "use_media": [1, 1, 1],
+		"see_stats": [0, 0, 0],
+		"see_list": [0, 0, 0],
+		"edit": [0, 0, 0],
+		"see_all": [1, 1, 1],
+		"delete_any": [1, 1, 1],
+		"edit_any": [1, 1, 1]
+    }
+}
