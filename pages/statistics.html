@@ -1,0 +1,61 @@
+<script src="{S:DIR}prepared_media/shorturl/main.js"></script>
+<div class="row d-flex justify-content-center">
+    <div class="col-lg-10 col-xl-8 col-xxl-7 mt-5 text-center">
+		<div class="text-start" style="display:inline-block;">
+			<a href="{S:DIR}shorturl" class="black-link">{L:SHORTEN_LINK}</a> &gt;
+			<h2 class="mb-5">{L:STATISTICS}</h2>
+		</div>
+        <div id="content" class="text-start"></div>
+    </div>
+</div>
+<script>
+// Get the identifier
+var identifier = location.hash.substr(1);
+
+/**
+ * Return a table based on an object
+ * 
+ * @param {*} object The object
+ * @param {*} total The total number of elements
+ * @param {*} placeHolder The string to use instead of empty key
+ * 
+ * @return The HTML code of the table
+ */
+function getTable(object, total, placeHolder='{JS:L:UNKNOWN}') {
+	var result = '<table>';
+	for (const [key, value] of Object.entries(object)) {
+		result += '<tr><td class="pe-5">' + escapeHtml(key || placeHolder) + '</td><td>' + Math.round(value * 100 / total) + ' % (' + value + ')</tr>';
+	}
+	return result + '</table>';
+}
+
+/**
+ * Function called on link delete
+ * Will leave the page
+ * 
+ * @param {*} id The id of the deleted link
+ */
+function onDelete(id) {
+	location.href = '{JS:S:DIR}shorturl';
+}
+
+// Get the statistics
+Api.apiRequest('shorturl', 'get-statistics', {'identifier': identifier}, r => {
+	// Check for errors
+	if (typeof r.error !== 'undefined') {
+		notifError(r.error, '{JS:L:ERROR}');
+		return;
+	}
+	// Display the link
+	displayLink('content', r.link, {R:shorturl.see_stats} || {R:shorturl.see_all}, true, {R:shorturl.edit} || {R:shorturl.edit_any}, 'onDelete');
+	// Display the statistics
+	$('#content').append('<hr class="mt-4 mb-4" /><h5>{JS:L:CLICKS}' + r.statistics.clicks + '</h5>' +
+	'<hr class="mt-4 mb-4" /><h5>{JS:L:BROWSERS}</h5><div class="ms-3">' + getTable(r.statistics.browsers, r.statistics.clicks) + '</div>' +
+	'<hr class="mt-4 mb-4" /><h5>{JS:L:OS}</h5><div class="ms-3">' + getTable(r.statistics.os, r.statistics.clicks) + '</div>' +
+	'<hr class="mt-4 mb-4" /><h5>{JS:L:IS_MOBILE}</h5><div class="ms-3">' + getTable(r.statistics.is_mobile, r.statistics.clicks) + '</div>' +
+	'<hr class="mt-4 mb-4" /><h5>{JS:L:IS_TABLET}</h5><div class="ms-3">' + getTable(r.statistics.is_tablet, r.statistics.clicks) + '</div>' +
+	'<hr class="mt-4 mb-4" /><h5>{JS:L:IS_ROBOT}</h5><div class="ms-3">' + getTable(r.statistics.is_robot, r.statistics.clicks) + '</div>' +
+	'<hr class="mt-4 mb-4" /><h5>{JS:L:REFERRERS}</h5><div class="ms-3">' + getTable(r.statistics.referrers, r.statistics.clicks) + '</div>' +
+	'<hr class="mt-4 mb-5" />' + getLinkButton('{JS:S:DIR}' + identifier + '/statistics', '{JS:L:FULL_EXPORT}'));
+});
+</script>

@@ -57,5 +57,15 @@
 	"save": "Save",
 	"no_right_to_edit": "You don't have the right to edit this link",
 	"link_updated": "The link target has been changed",
-	"all_missing_right": "You do not have the right to display the list of all the links"
+	"all_missing_right": "You do not have the right to display the list of all the links",
+	"no_right_to_stats": "You do not have the right to display the statistics of this link",
+	"clicks": "Number of clicks: ",
+	"browsers": "Browsers",
+	"os": "Operating systems",
+	"is_mobile": "Mobile device",
+	"is_tablet": "Tablet",
+	"is_robot": "Robot",
+	"referrers": "Origin of requests",
+	"unknown": "Unknown",
+	"full_export": "Full export"
 }

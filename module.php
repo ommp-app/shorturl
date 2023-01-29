@@ -242,6 +242,134 @@ function shorturl_process_api($action, $data) {
 			"formatted_last_edit" => date($user->module_lang->get("date_format"), $time),
 		];
 
+	} else if ($action == "get-statistics") {
+
+		// Check the parameters
+		if (!check_keys($data, ["identifier"])) {
+			return ["error" => $user->module_lang->get("missing_parameter")];
+		}
+
+		// Get informations about the link
+		$link = dbGetFirstLineSimple("{$db_prefix}shorturl", "identifier = " . $sql->quote($data['identifier']));
+		
+		// Check if link exists
+		if ($link === FALSE) {
+			return ["error" => $user->module_lang->get("link_does_not_exists")];
+		}
+
+		// Check if user has the right to see the statistics
+		if (($link['owner'] == $user->id && (!$user->has_right("shorturl.see_stats") && !$user->has_right("shorturl.see_all"))) || // Its own link without the see_stats or see_all right
+			($link['owner'] != $user->id && !$user->has_right("shorturl.see_all"))) { // Someone else link without see_all right
+				return ["error" => $user->module_lang->get("no_right_to_stats")];
+		}
+
+		// Load the browser decoder
+		require_once OMMP_ROOT . "/modules/shorturl/3rd-party/browser.php";
+
+		// Compute the statistics
+		$clicks = 0; // Number of clicks
+		$browsers = []; // Repartition of web browsers
+		$os = []; // Repartition of operating systems
+		$mobile = []; // Repartition of mobile browsers
+		$tablet = []; // Repartition of tablet browsers
+		$robot = []; // Repartition of robots
+		$referrers = []; // Most common referrers (domains only)
+		$unique_visitors = []; // Unique couple of IP/User agent
+
+		// Get all the visits
+		$yes = $user->module_lang->get("yes");
+		$no = $user->module_lang->get("no");
+		$request = $sql->query("SELECT * FROM {$db_prefix}shorturl_visits WHERE link_id = " . $sql->quote($link['id']));
+		while ($visit = $request->fetch()) {
+			
+			// Increment the number of clicks
+			$clicks++;
+
+			// Parse the user agent
+			$browser = new Browser($visit['user_agent']);
+
+			// Add the informations from the user agent
+			if (!isset($browsers[$browser->getBrowser()])) {
+				$browsers[$browser->getBrowser()] = 1;
+			} else {
+				$browsers[$browser->getBrowser()]++;
+			}
+
+			// Operating system
+			if (!isset($os[$browser->getPlatform()])) {
+				$os[$browser->getPlatform()] = 1;
+			} else {
+				$os[$browser->getPlatform()]++;
+			}
+
+			// Mobile device
+			$mobile_key = $browser->isMobile() ? $yes : $no;
+			if (!isset($mobile[$mobile_key])) {
+				$mobile[$mobile_key] = 1;
+			} else {
+				$mobile[$mobile_key]++;
+			}
+
+			// Tablet
+			$tablet_key = $browser->isTablet() ? $yes : $no;
+			if (!isset($tablet[$tablet_key])) {
+				$tablet[$tablet_key] = 1;
+			} else {
+				$tablet[$tablet_key]++;
+			}
+
+			// Robot
+			$robot_key = $browser->isRobot() ? $yes : $no;
+			if (!isset($robot[$robot_key])) {
+				$robot[$robot_key] = 1;
+			} else {
+				$robot[$robot_key]++;
+			}
+
+			// Parse referrer
+			$referrer_host = parse_url($visit['referrer'], PHP_URL_HOST);
+			if (!isset($referrers[$referrer_host])) {
+				$referrers[$referrer_host] = 1;
+			} else {
+				$referrers[$referrer_host]++;
+			}
+
+			// Count unique visitors
+			$unique_hash = hash("md5", $visit['ip'] . "|" . $visit['user_agent']);
+			if (!isset($unique_visitors[$unique_hash])) {
+				$unique_visitors[$unique_hash] = 1;
+			} else {
+				$unique_visitors[$unique_hash]++;
+			}
+
+		}
+		$request->closeCursor();
+
+		// Return the statistics
+		return [
+			"ok" => TRUE,
+			"link" => [
+				"id" => $link['id'],
+				"identifier" => $link['identifier'],
+				"target" => $link['target'],
+				"creation" => $link['creation_ts'],
+				"formatted_creation" => date($user->module_lang->get("date_format"), $link['creation_ts']),
+				"last_edit" => $link['edit_ts'],
+				"formatted_last_edit" => date($user->module_lang->get("date_format"), $link['edit_ts']),
+				"my_link" => $link['owner'] == $user->id
+			],
+			"statistics" => [
+				"clicks" => $clicks,
+				"browsers" => $browsers,
+				"os" => $os,
+				"is_mobile" => $mobile,
+				"is_tablet" => $tablet,
+				"is_robot" => $robot,
+				"referrers" => $referrers,
+				"unique_visitors" => count($unique_visitors)
+			]
+		];
+
 	}
 
     return FALSE;
@@ -287,14 +415,66 @@ function shorturl_process_page($page, $pages_path) {
  *      FALSE else (in this case, we will check the url with the remaining modules, order is defined by module's priority value)
  */
 function shorturl_url_handler($url) {
-	global $db_prefix, $sql;
+	global $db_prefix, $sql, $user;
+
+	// Check if we are in export mode
+	$statistics = substr($url, -11) == "/statistics";
+	if ($statistics) {
+		$url = substr($url, 0, -11);
+	}
     
 	// Search the value in the database
-	$link = dbGetFirstLineSimple("{$db_prefix}shorturl", "identifier = " . $sql->quote($url), "id, target");
+	$link = dbGetFirstLineSimple("{$db_prefix}shorturl", "identifier = " . $sql->quote($url), "id, target, owner");
 
 	// If link does not exists, return FALSE
 	if ($link === FALSE) {
 		return FALSE;
+	}
+
+	// If in statistics mode, return a CSV
+	if ($statistics) {
+
+		// Check if user has the right to export statistics
+		if (!$user->has_right("shorturl.use") || // No right to use module
+			($link['owner'] == $user->id && (!$user->has_right("shorturl.see_stats") && !$user->has_right("shorturl.see_all"))) || // Its own link without the see_stats or see_all right
+			($link['owner'] != $user->id && !$user->has_right("shorturl.see_all"))) { // Someone else link without see_all right
+				return FALSE;
+		}
+
+		// Set the headers
+		header("Content-Type: text/csv");
+		header("Content-Disposition: attachment; filename=$url.csv");
+
+		/**
+		 * Escape the string for the CSV
+		 * 
+		 * @param string $string
+		 * 		The string to escape
+		 * 
+		 * @return string
+		 * 		The escaped string
+		 */
+		function escape_string($string) {
+			if (strpos($string, ";") === FALSE) {
+				return $string;
+			}
+			if (strpos($string, '"') === FALSE) {
+				return '"' . $string . '"';
+			}
+			return '"' . str_replace('"', '""', $string) . '"';
+		}
+
+		// Print the statistics
+		print("ip;timestamp;user_agent;referrer\n");
+		$request = $sql->query("SELECT ip, `timestamp`, user_agent, referrer FROM {$db_prefix}shorturl_visits WHERE link_id = " . $sql->quote($link['id']) . " ORDER BY timestamp ASC");
+		while ($visit = $request->fetch()) {
+			print(escape_string($visit['ip']) . ";" . escape_string($visit['timestamp']) . ";" . escape_string($visit['user_agent']) . ";" . escape_string($visit['referrer']) . "\n");
+		}
+		$request->closeCursor();
+
+		// Return success
+		return TRUE;
+
 	}
 
 	// Save the visit

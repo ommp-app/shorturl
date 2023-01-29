@@ -12,11 +12,11 @@ function checkEnter(callback) {
 /**
  * Return a link displayed as a button
  * 
- * @param {*} target The target of the link(relative to the module)
+ * @param {*} target The target of the link
  * @param {*} content The text of the button
  */
 function getLinkButton(target, content) {
-	return '<a href="' + ommp_dir + 'shorturl/' + escapeHtml(target) + '" class="btn btn-outline-dark btn-lg ms-2 me-2" role="button" aria-pressed="true">' + escapeHtml(content) + '</a>'
+	return '<a href="' + escapeHtml(target) + '" class="btn btn-outline-dark btn-lg ms-2 me-2" role="button" aria-pressed="true">' + escapeHtml(content) + '</a>'
 }
 
 /**
@@ -27,14 +27,15 @@ function getLinkButton(target, content) {
  * @param {*} stats Should we display the statistictd button
  * @param {*} remove Should we display the delete button
  * @param {*} editable Is the link editable?
+ * @param {*} removeCallback The name of the function to call after link delete (optional)
  */
- function displayLink(element, link, stats, remove, editable) {
+ function displayLink(element, link, stats, remove, editable, removeCallback=null) {
 	// Copy button is only enabled in HTTPS
 	$('#' + element).append('<div id="link-preview-' + link.id + '"><input class="form-control mb-1 mt-4 me-2" style="width:50%;display:inline-block;" type="text" id="short-' + link.id + '" value="{JS:S:SCHEME}://{JS:S:DOMAIN}{JS:S:DIR}' + escapeHtml(link.identifier) + '" onclick="this.setSelectionRange(0,this.value.length)" readonly />' +
 	('{JS:S:SCHEME}' == 'https' ? '<img class="inline-image-semi ms-2 me-2" role="button" aria-pressed="true" title="{JS:L:COPY}" src="{JS:S:DIR}media/shorturl/copy.svg" onclick="navigator.clipboard.writeText(\'{JS:S:SCHEME}://{JS:S:DOMAIN}{JS:S:DIR}' + escapeHtml(link.identifier) + '\')" />' : '') +
 	(stats ? '<img class="inline-image-semi ms-2 me-2" role="button" aria-pressed="true" title="{JS:L:STATISTICS}" src="{JS:S:DIR}media/shorturl/stats.svg" onclick="location.href=\'{JS:S:DIR}shorturl/statistics#' + escapeHtml(link.identifier) + '\'" />' : '') +
 	(editable ? '<img class="inline-image-semi ms-2 me-2" role="button" aria-pressed="true" title="{JS:L:EDIT}" src="{JS:S:DIR}media/ommp/images/edit.svg" onclick="$(\'#edit-link-' + link.id + '\').toggle(500)" />' : '') +
-	(remove ? '<img class="inline-image-semi ms-2 me-2" role="button" aria-pressed="true" title="{JS:L:DELETE}" src="{JS:S:DIR}media/shorturl/delete.svg" onclick="deleteLink(' + link.id + ')" />' : '') +
+	(remove ? '<img class="inline-image-semi ms-2 me-2" role="button" aria-pressed="true" title="{JS:L:DELETE}" src="{JS:S:DIR}media/shorturl/delete.svg" onclick="deleteLink(' + link.id + (removeCallback !== null ? ', ' + removeCallback : '') + ')" />' : '') +
 	'<br /><img class="inline-image-small ms-2 me-2" role="button" aria-pressed="true" title="{JS:L:TARGET}" src="{JS:S:DIR}media/shorturl/target.svg" />' +
 	'<a href="' + escapeHtml(link.target) + '" target="_blank" id="link-a-' + link.id + '">' + escapeHtml(link.target) + '</a>' +
 	'<br /><div id="edit-link-' + link.id + '" style="display:none;"><input class="form-control me-2 mt-1 mb-1" style="width:70%;display:inline-block;" type="text" id="link-input-' + link.id + '" value="' + escapeHtml(link.target) + '" onkeyup="checkEnter(()=>{editLink(' + link.id +', this.value)})">' +
@@ -46,8 +47,9 @@ function getLinkButton(target, content) {
  * Delete a link after displaying a confirmation
  * 
  * @param {*} id The id of the link
+ * @param {*} callback The function to call after link delete (optional)
  */
-function deleteLink(id) {
+function deleteLink(id, callback=null) {
 	promptChoice('{JS:L:DELETE_LINK_CONFIRM}', '{JS:L:YES}', '{JS:L:NO}', () => {
 		// Call the API
 		Api.apiRequest('shorturl', 'delete-link', {'id': id}, r => {
@@ -62,6 +64,10 @@ function deleteLink(id) {
 			// If we are in a list, decrement the position
 			if (typeof currentPos !== 'undefined') {
 				currentPos--;
+			}
+			// Execute callback if needed
+			if (callback !== null) {
+				callback(id);
 			}
 		});
 	}, () => {}, '{JS:L:WARNING}');

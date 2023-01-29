@@ -57,5 +57,15 @@
 	"save": "Enregistrer",
 	"no_right_to_edit": "Vous n'avez pas le droit de modifier ce lien",
 	"link_updated": "La cible du lien a été modifiée",
-	"all_missing_right": "Vous n'avez pas le droit d'afficher la liste de tous les liens"
+	"all_missing_right": "Vous n'avez pas le droit d'afficher la liste de tous les liens",
+	"no_right_to_stats": "Vous n'avez pas le droit de voir les statistiques de ce lien",
+	"clicks": "Nombre de clics : ",
+	"browsers": "Navigateurs",
+	"os": "Systèmes d'exploitation",
+	"is_mobile": "Appareil mobile",
+	"is_tablet": "Tablette",
+	"is_robot": "Robot",
+	"referrers": "Origine des requêtes",
+	"unknown": "Inconnu",
+	"full_export": "Export complet"
 }

@@ -35,9 +35,9 @@ function createLink() {
 
 // Display buttons depending on rights
 if ({R:shorturl.see_list}) {
-	$('#buttons-div').append(getLinkButton('my-links', '{JS:L:MY_LINKS}'));
+	$('#buttons-div').append(getLinkButton(ommp_dir + 'shorturl/my-links', '{JS:L:MY_LINKS}'));
 }
 if ({R:shorturl.see_all}) {
-	$('#buttons-div').append(getLinkButton('all-links', '{JS:L:ALL_LINKS}'));
+	$('#buttons-div').append(getLinkButton(ommp_dir + 'shorturl/all-links', '{JS:L:ALL_LINKS}'));
 }
 </script>
