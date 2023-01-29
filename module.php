@@ -93,8 +93,13 @@ function shorturl_process_api($action, $data) {
  *      FALSE to generate a 404 error
  */
 function shorturl_process_page($page, $pages_path) {
-    // TODO
-	return FALSE;
+    global $user;
+    // This module uses only the HTML files without processing them
+    return module_simple_html($page, $pages_path, [], [
+		"" => $user->module_lang->get("shorten_link"),
+        "my-links" => $user->module_lang->get("my_links"),
+        "statistics" => $user->module_lang->get("statistics")
+    ]);
 }
 
 /**

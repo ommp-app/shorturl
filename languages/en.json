@@ -15,7 +15,7 @@
 	"shorturl.see_list#name": "See the list of its links",
 	"shorturl.see_list#desc": "Allow the user to view the list of links he has created",
 	"shorturl.see_all#name": "See the list of all links",
-	"shorturl.see_all#desc": "Allow user to view the list of all links created by all users",
+	"shorturl.see_all#desc": "Allow user to view the list and statistics of all links created by all users",
 	"shorturl.delete_any#name": "Remove any link",
 	"shorturl.delete_any#desc": "Allow user to delete any link",
 	"shorturl.edit_any#name": "Edit any link",
@@ -23,5 +23,8 @@
 	"shorturl.edit#name": "Change the target of a link",
 	"shorturl.edit#desc": "Allow the user to modify the target URL of one of his links without changing its identifier",
 	"list_cant_be_empty": "The list can not be empty",
-	"must_be_positive": "Please enter a positive integer"
+	"must_be_positive": "Please enter a positive integer",
+	"shorten_link": "Shorten a URL",
+	"my_links": "My links",
+	"statistics": "Statistics"
 }

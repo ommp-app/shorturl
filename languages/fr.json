@@ -15,7 +15,7 @@
 	"shorturl.see_list#name": "Voir la liste de ses liens",
 	"shorturl.see_list#desc": "Autoriser l'utilisateur à consulter la liste des liens qu'il a créé",
 	"shorturl.see_all#name": "Voir la liste de tous les liens",
-	"shorturl.see_all#desc": "Autoriser l'utilisateur à consulter la liste de la totalité des liens créés par tous les utilisateurs",
+	"shorturl.see_all#desc": "Autoriser l'utilisateur à consulter la liste et les statistiques de la totalité des liens créés par tous les utilisateurs",
 	"shorturl.delete_any#name": "Supprimer n'importe quel lien",
 	"shorturl.delete_any#desc": "Autoriser l'utilisateur supprimer n'importe quel lien",
 	"shorturl.edit_any#name": "Modifier n'importe quel lien",
@@ -23,5 +23,8 @@
 	"shorturl.edit#name": "Modifier la cible d'un lien",
 	"shorturl.edit#desc": "Autoriser l'utilisateur à modifier l'URL cible d'un de ses lien sans changer son identifiant",
 	"list_cant_be_empty": "La liste ne peut pas être vide",
-	"must_be_positive": "Veuillez entrer un entier positif"
+	"must_be_positive": "Veuillez entrer un entier positif",
+	"shorten_link": "Raccourcir une URL",
+	"my_links": "Mes liens",
+	"statistics": "Statistiques"
 }
