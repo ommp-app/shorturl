@@ -56,5 +56,6 @@
 	"load_more": "Charger plus",
 	"save": "Enregistrer",
 	"no_right_to_edit": "Vous n'avez pas le droit de modifier ce lien",
-	"link_updated": "La cible du lien a été modifiée"
+	"link_updated": "La cible du lien a été modifiée",
+	"all_missing_right": "Vous n'avez pas le droit d'afficher la liste de tous les liens"
 }

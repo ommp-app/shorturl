@@ -127,11 +127,16 @@ function shorturl_process_api($action, $data) {
 			]
 		];
 
-	} else if ($action == "get-my-links") {
+	} else if ($action == "get-my-links" || $action == "get-all-links") {
 
 		// Check if user has the right to see his links
-		if (!$user->has_right("shorturl.see_list")) {
+		if ($action == "get-my-links" && !$user->has_right("shorturl.see_list") && !$user->has_right("shorturl.see_all")) {
 			return ["error" => $user->module_lang->get("list_missing_right")];
+		}
+
+		// Check if user has the right to see all the links
+		if ($action == "get-all-links" && !$user->has_right("shorturl.see_all")) {
+			return ["error" => $user->module_lang->get("all_missing_right")];
 		}
 
 		// Get the start
@@ -142,7 +147,7 @@ function shorturl_process_api($action, $data) {
 
 		// Get all the links
 		$links = [];
-		$request = $sql->query("SELECT * FROM {$db_prefix}shorturl WHERE `owner` = " . $sql->quote($user->id) . " ORDER BY edit_ts DESC LIMIT $start, 10");
+		$request = $sql->query("SELECT * FROM {$db_prefix}shorturl" . ($action == "get-my-links" ? " WHERE `owner` = " . $sql->quote($user->id) : "") . " ORDER BY edit_ts DESC LIMIT $start, 10");
 		while ($link = $request->fetch()) {
 			$links[] = [
 				"id" => $link['id'],
@@ -152,7 +157,7 @@ function shorturl_process_api($action, $data) {
 				"formatted_creation" => date($user->module_lang->get("date_format"), $link['creation_ts']),
 				"last_edit" => $link['edit_ts'],
 				"formatted_last_edit" => date($user->module_lang->get("date_format"), $link['edit_ts']),
-				"my_link" => TRUE
+				"my_link" => $link['owner'] == $user->id
 			];
 		}
 		$request->closeCursor();
@@ -161,7 +166,7 @@ function shorturl_process_api($action, $data) {
 		return [
 			"ok" => TRUE,
 			"links" => $links,
-			"total" => dbCount("{$db_prefix}shorturl", "`owner` = " . $sql->quote($user->id))
+			"total" => dbCount("{$db_prefix}shorturl", $action == "get-my-links" ? "`owner` = " . $sql->quote($user->id) : "TRUE")
 		];
 
 	} else if ($action == "delete-link") {
@@ -222,7 +227,8 @@ function shorturl_process_api($action, $data) {
 		}
 
 		// Update the link
-		$result = $sql->exec("UPDATE {$db_prefix}shorturl SET `target` = " . $sql->quote($data['url']) . " WHERE id = " . $sql->quote($data['id']));
+		$time = time();
+		$result = $sql->exec("UPDATE {$db_prefix}shorturl SET `target` = " . $sql->quote($data['url']) . ", edit_ts = $time WHERE id = " . $sql->quote($data['id']));
 
 		// Check for errors
 		if ($result === FALSE) {
@@ -230,7 +236,11 @@ function shorturl_process_api($action, $data) {
         }
 
 		// Return success
-		return ["ok" => TRUE];
+		return [
+			"ok" => TRUE,
+			"last_edit" => $time,
+			"formatted_last_edit" => date($user->module_lang->get("date_format"), $time),
+		];
 
 	}
 

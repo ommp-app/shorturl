@@ -39,7 +39,7 @@ function getLinkButton(target, content) {
 	'<a href="' + escapeHtml(link.target) + '" target="_blank" id="link-a-' + link.id + '">' + escapeHtml(link.target) + '</a>' +
 	'<br /><div id="edit-link-' + link.id + '" style="display:none;"><input class="form-control me-2 mt-1 mb-1" style="width:70%;display:inline-block;" type="text" id="link-input-' + link.id + '" value="' + escapeHtml(link.target) + '" onkeyup="checkEnter(()=>{editLink(' + link.id +', this.value)})">' +
 	'<div class="btn pt-1 pb-1 ms-2 me-2 btn-light" style="vertical-align:baseline;" role="button" aria-pressed="true" onclick="editLink(' + link.id +', $(\'#link-input-' + link.id + '\').val())">{JS:L:SAVE}</div></div>' +
-	'<span>{JS:L:CREATION}' + link.formatted_creation + ' - {JS:L:LAST_EDIT}' + link.formatted_last_edit + '</span></div>');
+	'<span>{JS:L:CREATION}' + link.formatted_creation + ' - {JS:L:LAST_EDIT}<span id="last-edit-' + link.id + '">' + escapeHtml(link.formatted_last_edit) + '</span></span></div>');
 }
 
 /**
@@ -83,6 +83,7 @@ function editLink(id, target) {
 		}
 		// Update the link and hide the editor
 		$('#link-a-' + id).html(escapeHtml(target)).attr('href', target);
+		$('#last-edit-' + id).html(escapeHtml(r.formatted_last_edit));
 		$('#edit-link-' + id).hide(500);
 		notif('{JS:L:LINK_UPDATED}');
 	});

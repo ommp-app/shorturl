@@ -1,8 +1,10 @@
 <script src="{S:DIR}prepared_media/shorturl/main.js"></script>
 <div class="row d-flex justify-content-center">
     <div class="col-lg-10 col-xl-8 col-xxl-7 mt-5 text-center">
-		<a href="{S:DIR}shorturl" class="black-link">{L:SHORTEN_LINK}</a> &gt;
-		<h2 class="mb-5">{L:MY_LINKS}</h2>
+		<div class="text-start" style="display:inline-block;">
+			<a href="{S:DIR}shorturl" class="black-link">{L:SHORTEN_LINK}</a> &gt;
+			<h2 class="mb-5">{L:MY_LINKS}</h2>
+		</div>
         <div id="content" class="text-start">
 			<div id="links" class="mt-4"><div class="text-center"><i>{L:NOTHING_TO_DISPLAY}</i></div></div>
 			<div id="load-more" class="btn pt-1 pb-1 mt-5 btn-light" style="width:100%;display:none;" role="button" aria-pressed="true" onclick="displayLinks();">{L:LOAD_MORE}</div>

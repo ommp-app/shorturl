@@ -56,5 +56,6 @@
 	"load_more": "Load more",
 	"save": "Save",
 	"no_right_to_edit": "You don't have the right to edit this link",
-	"link_updated": "The link target has been changed"
+	"link_updated": "The link target has been changed",
+	"all_missing_right": "You do not have the right to display the list of all the links"
 }
