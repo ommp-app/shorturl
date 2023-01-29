@@ -8,7 +8,7 @@
 					<input class="form-control" style="width:70%;display:inline-block;" type="text" id="url" value="" onkeyup="checkEnter(createLink);">
 					<div class="btn pt-1 pb-1 mt-2 ms-2 me-2 btn-light" style="vertical-align:baseline;" role="button" aria-pressed="true" onclick="createLink()">{L:SHORTEN}</div>
 				</div>
-				<div id="link-result"></div>
+				<div id="link-result" class="mt-4" style="display:none;"><h5>{L:YOUR_LINK}</h5></div>
 				<div class="mt-5" id="buttons-div"></div>
 			</div>
 		</div>
@@ -40,9 +40,8 @@ function createLink() {
 			return;
 		}
 		// Display the link
-		$('#link-result').addClass('mt-4');
+		$('#link-result').show();
 		displayLink('link-result', r.link);
-		$('#link-result').prepend('<h5 class="mb-3">{JS:L:YOUR_LINK}</h5>');
 	});
 }
 
@@ -64,8 +63,9 @@ function getLinkButton(target, content) {
  */
 function displayLink(element, link) {
 	// Copy button is only enabled in HTTPS
-	$('#' + element).html('<input class="form-control mb-1" style="width:50%;display:inline-block;" type="text" id="short-' + link.identifier + '" value="{JS:S:SCHEME}://{JS:S:DOMAIN}{JS:S:DIR}' + escapeHtml(link.identifier) + '" onclick="this.setSelectionRange(0,this.value.length)" readonly>' +
-	('{JS:S:SCHEME}' == 'https' ? '<img class="inline-image-medium ms-2 me-2" role="button" aria-pressed="true" title="{JS:L:COPY}" src="{JS:S:DIR}media/shorturl/copy.svg" onclick=" navigator.clipboard.writeText(\'{JS:S:SCHEME}://{JS:S:DOMAIN}{JS:S:DIR}' + escapeHtml(link.identifier) + '\')" />' : '') +
+	$('#' + element).append('<input class="form-control mb-1 mt-4" style="width:50%;display:inline-block;" type="text" id="short-' + link.identifier + '" value="{JS:S:SCHEME}://{JS:S:DOMAIN}{JS:S:DIR}' + escapeHtml(link.identifier) + '" onclick="this.setSelectionRange(0,this.value.length)" readonly>' +
+	('{JS:S:SCHEME}' == 'https' ? '<img class="inline-image-medium ms-2 me-2" role="button" aria-pressed="true" title="{JS:L:COPY}" src="{JS:S:DIR}media/shorturl/copy.svg" onclick="navigator.clipboard.writeText(\'{JS:S:SCHEME}://{JS:S:DOMAIN}{JS:S:DIR}' + escapeHtml(link.identifier) + '\')" />' : '') +
+	({R:shorturl.see_stats} ? '<img class="inline-image-medium ms-2 me-2" role="button" aria-pressed="true" title="{JS:L:STATISTICS}" src="{JS:S:DIR}media/shorturl/stats.svg" onclick="location.href=\'{JS:S:DIR}shorturl/statistics#' + escapeHtml(link.identifier) + '\'" />' : '') +
 	'<br /><span>{JS:L:CREATION}' + link.formatted_creation + ' - {JS:L:LAST_EDIT}' + link.formatted_last_edit + '</span>');
 }
 
