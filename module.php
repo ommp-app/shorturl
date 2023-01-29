@@ -24,8 +24,23 @@
  *      else a string explaination of the error
  */
 function shorturl_check_config($name, $value, $lang) {
-    // TODO
+    
+	// Check not empty
+	if ($name == "characters" && $value == "") {
+		return $lang->get("list_cant_be_empty");
+	}
+
+	// Check number
+	if ($name == "lenght") {
+		$value = intval($value);
+		if ($value <= 0) {
+			return $lang->get("must_be_positive");
+		}
+	}
+
+	// If everything is good return TRUE
 	return TRUE;
+	
 }
 
 /**

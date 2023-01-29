@@ -21,5 +21,7 @@
 	"shorturl.edit_any#name": "Modifier n'importe quel lien",
 	"shorturl.edit_any#desc": "Autoriser l'utilisateur modifier n'importe quel lien",
 	"shorturl.edit#name": "Modifier la cible d'un lien",
-	"shorturl.edit#desc": "Autoriser l'utilisateur à modifier l'URL cible d'un de ses lien sans changer son identifiant"
+	"shorturl.edit#desc": "Autoriser l'utilisateur à modifier l'URL cible d'un de ses lien sans changer son identifiant",
+	"list_cant_be_empty": "La liste ne peut pas être vide",
+	"must_be_positive": "Veuillez entrer un entier positif"
 }

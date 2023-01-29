@@ -21,5 +21,7 @@
 	"shorturl.edit_any#name": "Edit any link",
 	"shorturl.edit_any#desc": "Allow user to edit any link",
 	"shorturl.edit#name": "Change the target of a link",
-	"shorturl.edit#desc": "Allow the user to modify the target URL of one of his links without changing its identifier"
+	"shorturl.edit#desc": "Allow the user to modify the target URL of one of his links without changing its identifier",
+	"list_cant_be_empty": "The list can not be empty",
+	"must_be_positive": "Please enter a positive integer"
 }
