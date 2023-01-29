@@ -52,7 +52,9 @@ function shorturl_check_config($name, $value, $lang) {
  *         The id of the user that will be deleted
  */
 function shorturl_delete_user($id) {
-	// TODO
+	global $sql, $db_prefix;
+	// Delete the links and the visits
+	$sql->exec("DELETE shorturl, shorturl_visits FROM {$db_prefix}shorturl shorturl JOIN {$db_prefix}shorturl_visits shorturl_visits ON id = link_id WHERE `owner` = " . $sql->quote($id));
 }
 
 /**
