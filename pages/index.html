@@ -1,0 +1,79 @@
+<div class="row d-flex justify-content-center">
+    <div class="col-lg-10 col-xl-8 col-xxl-7 mt-5 text-center">
+		<h2 class="mb-5 mt-5">{L:SHORTEN_LINK}</h2>
+        <div id="content" class="text-start">
+			<div id="user-profile">
+				<div class="mt-4">
+					<i>{L:URL_TO_SHORTEN}</i><br />
+					<input class="form-control" style="width:70%;display:inline-block;" type="text" id="url" value="" onkeyup="checkEnter(createLink);">
+					<div class="btn pt-1 pb-1 mt-2 ms-2 me-2 btn-light" style="vertical-align:baseline;" role="button" aria-pressed="true" onclick="createLink()">{L:SHORTEN}</div>
+				</div>
+				<div id="link-result"></div>
+				<div class="mt-5" id="buttons-div"></div>
+			</div>
+		</div>
+    </div>
+</div>
+<script>
+/**
+ * Check if ENTER has been pressed in an input
+ * 
+ * @param {*} callback The function to call if enter was pressed
+ */
+ function checkEnter(callback) {
+	if (event.key === 'Enter') {
+		callback();
+	}
+}
+
+/**
+ * Create a short link based on value in the input
+ */
+function createLink() {
+	// Get URL to shorten
+	var url = $('#url').val();
+	// Call the API
+	Api.apiRequest('shorturl', 'shorten-link', {'url': url}, r => {
+		// Check for errors
+		if (typeof r.error !== 'undefined') {
+			notifError(r.error, '{JS:L:ERROR}');
+			return;
+		}
+		// Display the link
+		$('#link-result').addClass('mt-4');
+		displayLink('link-result', r.link);
+		$('#link-result').prepend('<h5 class="mb-3">{JS:L:YOUR_LINK}</h5>');
+	});
+}
+
+/**
+ * Return a link displayed as a button
+ * 
+ * @param {*} target The target of the link(relative to the module)
+ * @param {*} content The text of the button
+ */
+function getLinkButton(target, content) {
+	return '<a href="' + ommp_dir + 'shorturl/' + escapeHtml(target) + '" class="btn btn-outline-dark btn-lg ms-2 me-2" role="button" aria-pressed="true">' + escapeHtml(content) + '</a>'
+}
+
+/**
+ * Display a link in a given element
+ * 
+ * @param {*} element The id of the container element
+ * @param {*} link An object representing the link as returned by the API
+ */
+function displayLink(element, link) {
+	// Copy button is only enabled in HTTPS
+	$('#' + element).html('<input class="form-control mb-1" style="width:50%;display:inline-block;" type="text" id="short-' + link.identifier + '" value="{JS:S:SCHEME}://{JS:S:DOMAIN}{JS:S:DIR}' + escapeHtml(link.identifier) + '" onclick="this.setSelectionRange(0,this.value.length)" readonly>' +
+	('{JS:S:SCHEME}' == 'https' ? '<img class="inline-image-medium ms-2 me-2" role="button" aria-pressed="true" title="{JS:L:COPY}" src="{JS:S:DIR}media/shorturl/copy.svg" onclick=" navigator.clipboard.writeText(\'{JS:S:SCHEME}://{JS:S:DOMAIN}{JS:S:DIR}' + escapeHtml(link.identifier) + '\')" />' : '') +
+	'<br /><span>{JS:L:CREATION}' + link.formatted_creation + ' - {JS:L:LAST_EDIT}' + link.formatted_last_edit + '</span>');
+}
+
+// Display buttons depending on rights
+if ({R:shorturl.see_list}) {
+	$('#buttons-div').append(getLinkButton('my-links', '{JS:L:MY_LINKS}'));
+}
+if ({R:shorturl.see_all}) {
+	$('#buttons-div').append(getLinkButton('all-links', '{JS:L:ALL_LINKS}'));
+}
+</script>

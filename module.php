@@ -31,7 +31,7 @@ function shorturl_check_config($name, $value, $lang) {
 	}
 
 	// Check number
-	if ($name == "lenght") {
+	if ($name == "length") {
 		$value = intval($value);
 		if ($value <= 0) {
 			return $lang->get("must_be_positive");
@@ -70,7 +70,65 @@ function shorturl_delete_user($id) {
  *      FALSE if the action does not exists
  */
 function shorturl_process_api($action, $data) {
-    // TODO
+	global $user, $config, $db_prefix, $sql;
+    
+	// Manage actions
+
+	if ($action == "shorten-link") {
+
+		// Check the parameters
+		if (!check_keys($data, ["url"])) {
+			return ["error" => $user->module_lang->get("missing_parameter")];
+		}
+
+		// Check the URL
+		if (!filter_var($data['url'], FILTER_VALIDATE_URL)) {
+			return ["error" => $user->module_lang->get("invalid_url")];
+		}
+
+		// Get forbidden names
+		$reserved = explode(",", $config->get("shorturl.reserved"));
+
+		// Generate an id
+		$identifier = "";
+		$i = 0;
+		do {
+			// Try 10 times to generate an identifier bedore returning an error
+			$i += 1;
+			if ($i > 10) {
+				return ["error" => $user->module_lang->get("failed_to_generate_id")];
+			}
+			// Random string
+			$identifier = random_str($config->get("shorturl.length"), $config->get("shorturl.characters"));
+		} while (in_array($identifier, $reserved) || dbSearchValue("{$db_prefix}shorturl", "identifier", $identifier));
+
+		// Save the link
+		$time = time();
+		$result = $sql->exec("INSERT INTO {$db_prefix}shorturl VALUE (NULL, " . $sql->quote($identifier) . ", " . $sql->quote($user->id) . ", " . $sql->quote($data['url']) . ", $time, $time)");
+
+		// Check for errors
+		if ($result === FALSE) {
+            return ["error" => $user->module_lang->get("cannot_save_link")];
+        }
+
+		// Return the created link
+		$formatted_date = date($user->module_lang->get("date_format"), $time);
+		return [
+			"ok" => TRUE,
+			"link" => [
+				"id" => $sql->lastInsertId(),
+				"identifier" => $identifier,
+				"target" => $data['url'],
+				"creation" => $time,
+				"formatted_creation" => $formatted_date,
+				"edit" => $time,
+				"formatted_last_edit" => $formatted_date,
+				"owner" => $user->username
+			]
+		];
+
+	}
+
     return FALSE;
 }
 
@@ -97,8 +155,9 @@ function shorturl_process_page($page, $pages_path) {
     // This module uses only the HTML files without processing them
     return module_simple_html($page, $pages_path, [], [
 		"" => $user->module_lang->get("shorten_link"),
-        "my-links" => $user->module_lang->get("my_links"),
-        "statistics" => $user->module_lang->get("statistics")
+		"my-links" => $user->module_lang->get("my_links"),
+		"all-links" => $user->module_lang->get("all_links"),
+		"statistics" => $user->module_lang->get("statistics")
     ]);
 }
 
