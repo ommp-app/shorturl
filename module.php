@@ -172,6 +172,23 @@ function shorturl_process_page($page, $pages_path) {
  *      FALSE else (in this case, we will check the url with the remaining modules, order is defined by module's priority value)
  */
 function shorturl_url_handler($url) {
-    // TODO
-    return FALSE;
+	global $db_prefix, $sql;
+    
+	// Search the value in the database
+	$link = dbGetFirstLineSimple("{$db_prefix}shorturl", "identifier = " . $sql->quote($url), "id, target");
+
+	// If link does not exists, return FALSE
+	if ($link === FALSE) {
+		return FALSE;
+	}
+
+	// Save the visit
+	$sql->exec("INSERT INTO {$db_prefix}shorturl_visits VALUES (" . $sql->quote($link['id']) . ", " . $sql->quote($_SERVER['REMOTE_ADDR']) . ", " . time() .
+		", " . $sql->quote(substr($_SERVER['HTTP_USER_AGENT'], 0, 256)) . ", " . $sql->quote(substr($_SERVER['HTTP_REFERER'], 0, 256)) . ")");
+
+	// Redirect to the page
+	header('Location: ' . $link['target'], true, 302);
+
+	// Return success
+	return TRUE;
 }
