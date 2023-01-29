@@ -39,5 +39,22 @@
 	"creation": "Creation: ",
 	"last_edit": "Last edit: ",
 	"your_link": "Your link",
-	"copy": "Copy"
+	"copy": "Copy",
+	"list_missing_right": "You do not have the right to display the list of your links",
+	"nothing_to_display": "Nothing to display",
+	"target": "Target",
+	"delete": "Delete",
+	"edit": "Edit",
+	"delete_link_confirm": "Do you really want to delete this link?",
+	"yes": "Yes",
+	"no": "No",
+	"link_deleted": "The link has been deleted",
+	"warning": "Warning",
+	"link_does_not_exists": "This link does not exists",
+	"no_right_to_delete": "You don't have the right to delete this link",
+	"cannot_delete_link": "Unable to delete the link",
+	"load_more": "Load more",
+	"save": "Save",
+	"no_right_to_edit": "You don't have the right to edit this link",
+	"link_updated": "The link target has been changed"
 }

@@ -1,7 +1,7 @@
 {
     "configurations": {
         "length": "5",
-		"reserved": "ommp,registration,connection,settings,api,media",
+		"reserved": "ommp,registration,connection,settings,api,media,prepared_media",
 		"characters": "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789"
     },
     "rights": {
@@ -9,7 +9,7 @@
         "use_media": [1, 1, 1],
 		"see_stats": [1, 1, 0],
 		"see_list": [1, 1, 0],
-		"edit": [1, 0, 0],
+		"edit": [1, 1, 0],
 		"see_all": [1, 0, 0],
 		"delete_any": [1, 0, 0],
 		"edit_any": [1, 0, 0]

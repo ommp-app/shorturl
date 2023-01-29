@@ -39,5 +39,22 @@
 	"creation": "Création : ",
 	"last_edit": "Dernière modification : ",
 	"your_link": "Votre lien",
-	"copy": "Copier"
+	"copy": "Copier",
+	"list_missing_right": "Vous n'avez pas le droit d'afficher la liste de vos liens",
+	"nothing_to_display": "Rien à afficher",
+	"target": "Destination",
+	"delete": "Supprimer",
+	"edit": "Modifier",
+	"delete_link_confirm": "Voulez-vous vraiment supprimer ce lien ?",
+	"yes": "Oui",
+	"no": "Non",
+	"link_deleted": "Le lien a été supprimé",
+	"warning": "Attention",
+	"link_does_not_exists": "Ce lien n'existe pas",
+	"no_right_to_delete": "Vous n'avez pas le droit de supprimer ce lien",
+	"cannot_delete_link": "Impossible de supprimer le lien",
+	"load_more": "Charger plus",
+	"save": "Enregistrer",
+	"no_right_to_edit": "Vous n'avez pas le droit de modifier ce lien",
+	"link_updated": "La cible du lien a été modifiée"
 }

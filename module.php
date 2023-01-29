@@ -54,7 +54,7 @@ function shorturl_check_config($name, $value, $lang) {
 function shorturl_delete_user($id) {
 	global $sql, $db_prefix;
 	// Delete the links and the visits
-	$sql->exec("DELETE shorturl, shorturl_visits FROM {$db_prefix}shorturl shorturl JOIN {$db_prefix}shorturl_visits shorturl_visits ON id = link_id WHERE `owner` = " . $sql->quote($id));
+	$sql->exec("DELETE shorturl, shorturl_visits FROM {$db_prefix}shorturl shorturl LEFT JOIN {$db_prefix}shorturl_visits shorturl_visits ON id = link_id WHERE `owner` = " . $sql->quote($id));
 }
 
 /**
@@ -121,11 +121,116 @@ function shorturl_process_api($action, $data) {
 				"target" => $data['url'],
 				"creation" => $time,
 				"formatted_creation" => $formatted_date,
-				"edit" => $time,
+				"last_edit" => $time,
 				"formatted_last_edit" => $formatted_date,
-				"owner" => $user->username
+				"my_link" => TRUE
 			]
 		];
+
+	} else if ($action == "get-my-links") {
+
+		// Check if user has the right to see his links
+		if (!$user->has_right("shorturl.see_list")) {
+			return ["error" => $user->module_lang->get("list_missing_right")];
+		}
+
+		// Get the start
+		$start = 0;
+		if (isset($data['start'])) {
+			$start = intval($data['start']);
+		}
+
+		// Get all the links
+		$links = [];
+		$request = $sql->query("SELECT * FROM {$db_prefix}shorturl WHERE `owner` = " . $sql->quote($user->id) . " ORDER BY edit_ts DESC LIMIT $start, 10");
+		while ($link = $request->fetch()) {
+			$links[] = [
+				"id" => $link['id'],
+				"identifier" => $link['identifier'],
+				"target" => $link['target'],
+				"creation" => $link['creation_ts'],
+				"formatted_creation" => date($user->module_lang->get("date_format"), $link['creation_ts']),
+				"last_edit" => $link['edit_ts'],
+				"formatted_last_edit" => date($user->module_lang->get("date_format"), $link['edit_ts']),
+				"my_link" => TRUE
+			];
+		}
+		$request->closeCursor();
+
+		// Return the links
+		return [
+			"ok" => TRUE,
+			"links" => $links,
+			"total" => dbCount("{$db_prefix}shorturl", "`owner` = " . $sql->quote($user->id))
+		];
+
+	} else if ($action == "delete-link") {
+
+		// Check the parameters
+		if (!check_keys($data, ["id"])) {
+			return ["error" => $user->module_lang->get("missing_parameter")];
+		}
+
+		// Get informations about the link
+		$link = dbGetFirstLineSimple("{$db_prefix}shorturl", "id = " . $sql->quote($data['id']));
+		
+		// Check if link exists
+		if ($link === FALSE) {
+			return ["error" => $user->module_lang->get("link_does_not_exists")];
+		}
+
+		// Check if user has right to delete the link
+		if ($link['owner'] != $user->id && !$user->has_right("shorturl.delete_any")) {
+			return ["error" => $user->module_lang->get("no_right_to_delete")];
+		}
+
+		// Delete the link
+		$result = $sql->exec("DELETE shorturl, shorturl_visits FROM {$db_prefix}shorturl shorturl LEFT JOIN {$db_prefix}shorturl_visits shorturl_visits ON id = link_id WHERE id = " . $sql->quote($data['id']));
+
+		// Check for errors
+		if ($result === FALSE) {
+            return ["error" => $user->module_lang->get("cannot_delete_link")];
+        }
+
+		// Return success
+		return ["ok" => TRUE];
+
+	} else if ($action == "edit-link") {
+
+		// Check the parameters
+		if (!check_keys($data, ["id", "url"])) {
+			return ["error" => $user->module_lang->get("missing_parameter")];
+		}
+
+		// Check the URL
+		if (!filter_var($data['url'], FILTER_VALIDATE_URL)) {
+			return ["error" => $user->module_lang->get("invalid_url")];
+		}
+
+		// Get informations about the link
+		$link = dbGetFirstLineSimple("{$db_prefix}shorturl", "id = " . $sql->quote($data['id']));
+		
+		// Check if link exists
+		if ($link === FALSE) {
+			return ["error" => $user->module_lang->get("link_does_not_exists")];
+		}
+
+		// Check if user has right to edit the link
+		if (($link['owner'] == $user->id && (!$user->has_right("shorturl.edit") && !$user->has_right("shorturl.edit_any"))) || // Owner without the right edit or edit_any
+			($link['owner'] != $user->id && !$user->has_right("shorturl.edit_any"))) { // Not owner without the right edit_any
+			return ["error" => $user->module_lang->get("no_right_to_edit")];
+		}
+
+		// Update the link
+		$result = $sql->exec("UPDATE {$db_prefix}shorturl SET `target` = " . $sql->quote($data['url']) . " WHERE id = " . $sql->quote($data['id']));
+
+		// Check for errors
+		if ($result === FALSE) {
+            return ["error" => $user->module_lang->get("cannot_delete_link")];
+        }
+
+		// Return success
+		return ["ok" => TRUE];
 
 	}
 

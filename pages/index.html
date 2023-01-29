@@ -1,31 +1,19 @@
+<script src="{S:DIR}prepared_media/shorturl/main.js"></script>
 <div class="row d-flex justify-content-center">
     <div class="col-lg-10 col-xl-8 col-xxl-7 mt-5 text-center">
 		<h2 class="mb-5 mt-5">{L:SHORTEN_LINK}</h2>
         <div id="content" class="text-start">
-			<div id="user-profile">
-				<div class="mt-4">
-					<i>{L:URL_TO_SHORTEN}</i><br />
-					<input class="form-control" style="width:70%;display:inline-block;" type="text" id="url" value="" onkeyup="checkEnter(createLink);">
-					<div class="btn pt-1 pb-1 mt-2 ms-2 me-2 btn-light" style="vertical-align:baseline;" role="button" aria-pressed="true" onclick="createLink()">{L:SHORTEN}</div>
-				</div>
-				<div id="link-result" class="mt-4" style="display:none;"><h5>{L:YOUR_LINK}</h5></div>
-				<div class="mt-5" id="buttons-div"></div>
+			<div class="mt-4">
+				<i>{L:URL_TO_SHORTEN}</i><br />
+				<input class="form-control" style="width:70%;display:inline-block;" type="text" id="url" value="" onkeyup="checkEnter(createLink);">
+				<div class="btn pt-1 pb-1 mt-2 ms-2 me-2 btn-light" style="vertical-align:baseline;" role="button" aria-pressed="true" onclick="createLink()">{L:SHORTEN}</div>
 			</div>
+			<div id="link-result" class="mt-4" style="display:none;"><h5>{L:YOUR_LINK}</h5></div>
+			<div class="mt-5" id="buttons-div"></div>
 		</div>
     </div>
 </div>
 <script>
-/**
- * Check if ENTER has been pressed in an input
- * 
- * @param {*} callback The function to call if enter was pressed
- */
- function checkEnter(callback) {
-	if (event.key === 'Enter') {
-		callback();
-	}
-}
-
 /**
  * Create a short link based on value in the input
  */
@@ -41,32 +29,8 @@ function createLink() {
 		}
 		// Display the link
 		$('#link-result').show();
-		displayLink('link-result', r.link);
+		displayLink('link-result', r.link, {R:shorturl.see_stats}, true, {R:shorturl.edit} || {R:shorturl.edit_any});
 	});
-}
-
-/**
- * Return a link displayed as a button
- * 
- * @param {*} target The target of the link(relative to the module)
- * @param {*} content The text of the button
- */
-function getLinkButton(target, content) {
-	return '<a href="' + ommp_dir + 'shorturl/' + escapeHtml(target) + '" class="btn btn-outline-dark btn-lg ms-2 me-2" role="button" aria-pressed="true">' + escapeHtml(content) + '</a>'
-}
-
-/**
- * Display a link in a given element
- * 
- * @param {*} element The id of the container element
- * @param {*} link An object representing the link as returned by the API
- */
-function displayLink(element, link) {
-	// Copy button is only enabled in HTTPS
-	$('#' + element).append('<input class="form-control mb-1 mt-4" style="width:50%;display:inline-block;" type="text" id="short-' + link.identifier + '" value="{JS:S:SCHEME}://{JS:S:DOMAIN}{JS:S:DIR}' + escapeHtml(link.identifier) + '" onclick="this.setSelectionRange(0,this.value.length)" readonly>' +
-	('{JS:S:SCHEME}' == 'https' ? '<img class="inline-image-medium ms-2 me-2" role="button" aria-pressed="true" title="{JS:L:COPY}" src="{JS:S:DIR}media/shorturl/copy.svg" onclick="navigator.clipboard.writeText(\'{JS:S:SCHEME}://{JS:S:DOMAIN}{JS:S:DIR}' + escapeHtml(link.identifier) + '\')" />' : '') +
-	({R:shorturl.see_stats} ? '<img class="inline-image-medium ms-2 me-2" role="button" aria-pressed="true" title="{JS:L:STATISTICS}" src="{JS:S:DIR}media/shorturl/stats.svg" onclick="location.href=\'{JS:S:DIR}shorturl/statistics#' + escapeHtml(link.identifier) + '\'" />' : '') +
-	'<br /><span>{JS:L:CREATION}' + link.formatted_creation + ' - {JS:L:LAST_EDIT}' + link.formatted_last_edit + '</span>');
 }
 
 // Display buttons depending on rights
