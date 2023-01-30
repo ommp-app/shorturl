@@ -49,7 +49,7 @@ Api.apiRequest('shorturl', 'get-statistics', {'identifier': identifier}, r => {
 	// Display the link
 	displayLink('content', r.link, {R:shorturl.see_stats} || {R:shorturl.see_all}, true, {R:shorturl.edit} || {R:shorturl.edit_any}, 'onDelete');
 	// Display the statistics
-	$('#content').append('<hr class="mt-4 mb-4" /><h5>{JS:L:CLICKS}' + r.statistics.clicks + '</h5>' +
+	$('#content').append('<hr class="mt-4 mb-4" /><h5>{JS:L:CLICKS}' + r.statistics.clicks + ' - {JS:L:UNIQUE_VISITORS}' + r.statistics.unique_visitors + '</h5>' +
 	'<hr class="mt-4 mb-4" /><h5>{JS:L:BROWSERS}</h5><div class="ms-3">' + getTable(r.statistics.browsers, r.statistics.clicks) + '</div>' +
 	'<hr class="mt-4 mb-4" /><h5>{JS:L:OS}</h5><div class="ms-3">' + getTable(r.statistics.os, r.statistics.clicks) + '</div>' +
 	'<hr class="mt-4 mb-4" /><h5>{JS:L:IS_MOBILE}</h5><div class="ms-3">' + getTable(r.statistics.is_mobile, r.statistics.clicks) + '</div>' +

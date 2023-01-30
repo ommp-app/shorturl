@@ -67,5 +67,6 @@
 	"is_robot": "Robot",
 	"referrers": "Origine des requêtes",
 	"unknown": "Inconnu",
-	"full_export": "Export complet"
+	"full_export": "Export complet",
+	"unique_visitors": "Visiteurs uniques : "
 }
