@@ -74,7 +74,36 @@ function shorturl_process_api($action, $data) {
     
 	// Manage actions
 
-	if ($action == "shorten-link") {
+	if ($action == "get-informations") {
+
+		// Check the parameters
+		if (!check_keys($data, ["id"])) {
+			return ["error" => $user->module_lang->get("missing_parameter")];
+		}
+
+		// Get informations about the link
+		$link = dbGetFirstLineSimple("{$db_prefix}shorturl", "owner = " . $sql->quote($user->id) . " AND id = " . $sql->quote($data['id']));
+		
+		// Check if link exists
+		if ($link === FALSE) {
+			return ["error" => $user->module_lang->get("link_does_not_exists")];
+		}
+
+		// Return the informations
+		return [
+			"ok" => TRUE,
+			"link" => [
+				"id" => $link['id'],
+				"identifier" => $link['identifier'],
+				"target" => $link['target'],
+				"creation" => $link['creation_ts'],
+				"formatted_creation" => date($user->module_lang->get("date_format"), $link['creation_ts']),
+				"last_edit" => $link['edit_ts'],
+				"formatted_last_edit" => date($user->module_lang->get("date_format"), $link['edit_ts'])
+			]
+		];
+
+	} else if ($action == "shorten-link") {
 
 		// Check the parameters
 		if (!check_keys($data, ["url"])) {
