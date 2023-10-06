@@ -13,6 +13,7 @@ START TRANSACTION;
 SET time_zone = "+00:00";
 
 -- Create the short urls table
+DROP TABLE IF EXISTS `{PREFIX}shorturl`;
 CREATE TABLE IF NOT EXISTS `{PREFIX}shorturl` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `identifier` text COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -24,6 +25,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}shorturl` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Create the visits history table
+DROP TABLE IF EXISTS `{PREFIX}shorturl_visits`;
 CREATE TABLE IF NOT EXISTS `{PREFIX}shorturl_visits` (
   `link_id` int(11) NOT NULL,
   `ip` text COLLATE utf8mb4_unicode_ci NOT NULL,
