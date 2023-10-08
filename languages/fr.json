@@ -9,7 +9,7 @@
 	"shorturl.reserved#name": "Noms réservés",
 	"shorturl.reserved#desc": "Liste des noms réservés pour les identifiants (les identifiants ne peuvent également pas avoir le même nom qu'un module installé)",
 	"shorturl.characters#name": "Caractères des identifiants",
-	"shorturl.characters#desc": "Liste des caractères pouvant être utilisés pour générer l'identifiant (par défaut les caractères trop similaires visuelement sont exclus)",
+	"shorturl.characters#desc": "Liste des caractères pouvant être utilisés pour générer l'identifiant (par défaut les caractères trop similaires visuellement sont exclus)",
 	"shorturl.see_stats#name": "Voir les statistiques",
 	"shorturl.see_stats#desc": "Autoriser l'utilisateur à visualiser les statistiques de visite d'un lien lui appartenant",
 	"shorturl.see_list#name": "Voir la liste de ses liens",
